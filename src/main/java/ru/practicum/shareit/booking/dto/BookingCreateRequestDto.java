@@ -6,11 +6,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- */
 @Data
-public class BookingDto {
+public class BookingCreateRequestDto {
+
     @NotNull
     private Long itemId;
 

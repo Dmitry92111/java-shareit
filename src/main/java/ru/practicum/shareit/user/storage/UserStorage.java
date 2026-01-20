@@ -20,5 +20,5 @@ public interface UserStorage {
 
     boolean existsByEmail(String email);
 
-    boolean existsByEmail(String email, Long excludeId);
+    boolean existsByEmailAndIdNot(String email, Long excludeId);
 }
