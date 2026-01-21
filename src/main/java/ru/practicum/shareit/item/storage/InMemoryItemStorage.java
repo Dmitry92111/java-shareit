@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.storage;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
@@ -8,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
+@Profile("inmemory")
 public class InMemoryItemStorage implements ItemStorage {
     private final Map<Long, Item> items = new ConcurrentHashMap<>();
     private final AtomicLong idCounter = new AtomicLong(0);
@@ -20,13 +22,12 @@ public class InMemoryItemStorage implements ItemStorage {
     @Override
     public List<Item> findAllByOwnerId(Long ownerId) {
         return items.values().stream()
-                .filter(item -> item.getOwnerId().equals(ownerId))
+                .filter(item -> item.getOwner().getId().equals(ownerId))
                 .toList();
     }
 
     @Override
     public List<Item> searchItemsByText(String text) {
-
         String formattedText = text.toLowerCase().trim();
         return items.values().stream()
                 .filter(Item::getAvailable)

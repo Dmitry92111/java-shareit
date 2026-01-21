@@ -2,6 +2,9 @@ package ru.practicum.shareit.item;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
+import ru.practicum.shareit.item.dto.CommentCreateDto;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
@@ -28,13 +31,14 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> findAllByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.findAllByOwnerId(userId).stream().map(ItemMapper::toDto).toList();
+    public List<ItemWithBookingsDto> getItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemService.getOwnerItems(userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto findById(@PathVariable Long itemId) {
-        return ItemMapper.toDto(itemService.findById(itemId));
+    public ItemWithBookingsDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                       @PathVariable Long itemId) {
+        return itemService.getItemByIdWithBookings(userId, itemId);
     }
 
     @PatchMapping("/{itemId}")
@@ -48,5 +52,12 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text) {
         return itemService.search(text).stream().map(ItemMapper::toDto).toList();
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                 @PathVariable Long itemId,
+                                 @Valid @RequestBody CommentCreateDto dto) {
+        return itemService.addComment(userId, itemId, dto);
     }
 }

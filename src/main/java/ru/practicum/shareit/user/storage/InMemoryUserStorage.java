@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.storage;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.model.User;
 
@@ -12,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 
 @Repository
+@Profile("inmemory")
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new ConcurrentHashMap<>();
     private final AtomicLong idCounter = new AtomicLong(0);
@@ -56,7 +58,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean existsByEmail(String email, Long excludeId) {
+    public boolean existsByEmailAndIdNot(String email, Long excludeId) {
         return users.values().stream()
                 .anyMatch(user -> !user.getId().equals(excludeId) && user.getEmail().equals(email));
     }

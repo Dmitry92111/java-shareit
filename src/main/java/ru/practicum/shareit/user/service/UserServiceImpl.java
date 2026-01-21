@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.type.DuplicatedDataException;
 import ru.practicum.shareit.exception.type.NotFoundException;
 import ru.practicum.shareit.user.model.User;
@@ -14,8 +15,9 @@ import static ru.practicum.shareit.exception.ExceptionMessages.*;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
-    UserStorage userStorage;
+    private final UserStorage userStorage;
 
     public UserServiceImpl(UserStorage userStorage) {
         this.userStorage = userStorage;
@@ -43,6 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User create(User user) {
         log.debug("Trying to create user {}", user);
         if (userStorage.existsByEmail(user.getEmail())) {
@@ -55,6 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User update(Long id, User user) {
         log.debug("Trying to update user {}", user);
         User existingUser = findById(id);
@@ -63,7 +67,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (user.getEmail() != null) {
-            if (!user.getEmail().equals(existingUser.getEmail()) && userStorage.existsByEmail(user.getEmail(), id)) {
+            if (!user.getEmail().equals(existingUser.getEmail()) && userStorage.existsByEmailAndIdNot(user.getEmail(), id)) {
                 log.warn("Cannot update User with id = {}, email: {} already exists in storage",
                         user.getId(), user.getEmail());
                 throw new DuplicatedDataException(String.format(EMAIL_ALREADY_EXIST, user.getEmail()));
@@ -71,12 +75,13 @@ public class UserServiceImpl implements UserService {
             existingUser.setEmail(user.getEmail());
         }
 
-        userStorage.update(existingUser);
+        User updatedUser = userStorage.update(existingUser);
         log.info("User with id {} has been updated successfully", id);
-        return existingUser;
+        return updatedUser;
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         log.debug("Trying to delete user with id {}", id);
         findById(id);
