@@ -36,8 +36,8 @@ docker-compose up
 
 Приложения будут доступны:
 
-main-service: http://localhost:8080
-stats-service: http://localhost:9090
+- main-service: http://localhost:8080
+- stats-service: http://localhost:9090
 
 ## Тестирование
 
@@ -46,9 +46,9 @@ stats-service: http://localhost:9090
 newman run ./tests/postman/ewm-main-service.json
 
 ## Структура
-ewm-main-service/
-ewm-stats-service/
-docker-compose.yml
+- ewm-main-service
+- ewm-stats-service
+- docker-compose.yml
 
 ## Автор
 Dmitry Karfidov
